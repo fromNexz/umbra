@@ -127,7 +127,7 @@ class ScannerAdapter:
         Returns:
             Event pronto para scoring
         """
-        # TODO: Implementar quando o módulo enum estiver pronto
+        # + Implementar quando o módulo enum estiver pronto
         
         url = enum_result.get('url')
         findings = enum_result.get('findings', [])
