@@ -49,10 +49,10 @@ class WeightConfig:
     # ========================================================================
     
     IP_BLACKLISTED = 2.0        # IP em blacklist conhecida → BLOQUEIO QUASE CERTO
-    IP_UNKNOWN = 0.5            # IP nunca visto antes → SUSPEITA LEVE
+    IP_UNKNOWN = 0.2            # IP nunca visto antes → SUSPEITA LEVE
     IP_TOR_PROXY = 1.0          # Tor/VPN/Proxy → SUSPEITA MODERADA
     IP_GEO_RISK_HIGH = 0.5      # País de alto risco (CN, RU, KP) → SUSPEITA MODERADA
-    IP_GEO_RISK_MEDIUM = 0.2    # País de risco médio → SUSPEITA LEVE
+    IP_GEO_RISK_MEDIUM = 0.1    # País de risco médio → SUSPEITA LEVE
     IP_RECENT_ATTACK = 0.7      # IP atacou recentemente → SUSPEITA ALTA
     
     # ========================================================================
@@ -226,29 +226,29 @@ if __name__ == "__main__":
     print("=" * 80)
     print()
     
-    print("📊 Pesos das Dimensões:")
+    print(" Pesos das Dimensões:")
     for dim, weight in config.dimension_weights.items():
         print(f"  • {dim:20s}: {weight:.1f}")
     print()
     
-    print("🔍 Fatores de IP:")
+    print(" Fatores de IP:")
     print(f"  • Blacklisted: {config.IP_BLACKLISTED}")
     print(f"  • Unknown: {config.IP_UNKNOWN}")
     print(f"  • Tor/Proxy: {config.IP_TOR_PROXY}")
     print()
     
-    print("⚡ Fatores de Comportamento:")
+    print(" Fatores de Comportamento:")
     print(f"  • High Rate: {config.RATE_HIGH}")
     print(f"  • Sequential Scan: {config.SEQUENTIAL_SCAN}")
     print()
     
-    print("💣 Fatores de Payload:")
+    print(" Fatores de Payload:")
     print(f"  • SQL Injection: {config.SQL_INJECTION}")
     print(f"  • XSS: {config.XSS_ATTEMPT}")
     print(f"  • Path Traversal: {config.PATH_TRAVERSAL}")
     print()
-    
-    print("🎯 Thresholds de Decisão:")
+
+    print(" Thresholds de Decisão:")
     print(f"  • Safe: < {config.THRESHOLD_SAFE}")
     print(f"  • Low: {config.THRESHOLD_SAFE} - {config.THRESHOLD_LOW}")
     print(f"  • Medium: {config.THRESHOLD_LOW} - {config.THRESHOLD_MEDIUM}")
