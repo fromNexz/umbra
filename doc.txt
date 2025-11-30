@@ -1,0 +1,157 @@
+Plano resumido para desenvolvimento de módulos de reconhecimento (recon) para Umbra.
+
+@ ----------------------------------------
+Arquitetura de código recomendada
+
+umbra_core/
+  recon/
+    passive/
+    active/
+  fingerprint/
+  enumerators/
+    http_enum/
+    dir_enum/
+    port_scan/
+  scoring/
+  storage/
+    db.py
+  api/
+panel/
+tests/
+
+ - Módulos pequenos, funções puras onde possível.
+
+ - Interface unificada: todo scanner retorna mesma structure JSON.
+
+------------------------------------------ @
+
+
+@ -----------------------------------------
+JSON de saída padrão (exemplo)
+
+{
+  "target": "example.com",
+  "type": "recon/port_scan",
+  "timestamp": "2025-11-29T15:00:00Z",
+  "results": [
+    {"port": 22, "proto": "tcp", "state": "open", "service": "ssh", "banner": "OpenSSH_8.2p1", "score": 0.45},
+    {"port": 80, "proto": "tcp", "state": "open", "service": "http", "banner": "nginx/1.18.0", "score": 0.3}
+  ],
+  "meta": {"scan_time_s": 4.2, "tool_version": "umbra-recon-0.1"}
+}
+
+------------------------------------------- @
+
+@ -----------------------------------------
+Boas práticas técnicas (robustez e segurança)
+
+Timeouts e retries configuráveis. Nunca bloqueie indefinidamente.
+
+Semáforos/concurrency limits por alvo e global (asyncio.Semaphore).
+
+Backoff exponencial para erros e rate limit responses (429).
+
+User-Agent rotativo e headers configuráveis, para testar fingerprinting e evitar bloqueio por WAF trivial.
+
+Proxy support (opcional) — obrigatório para testes de origem diferente.
+
+Rate limiting respeitado: implemente delays adaptativos por host.
+
+Input sanitization (nenhum comando shell direto, escape todo input).
+
+Execução em sandbox quando rodar módulos que fazem payloads ou uploads.
+
+------------------------------------------ @ 
+
+@ -----------------------------------------
+
+Observabilidade e testes
+
+Traces: cada request tem trace_id, correlacionável.
+
+Snapshots: armazene respostas críticas (banners, headers, first 8KB de body) para replays.
+
+Test suites: crie ambientes controlados (containers) com serviços intencionais para validar cada módulo.
+
+Fuzz tests nas funções de parsing para evitar crash por respostas malformadas.
+------------------------------------------ @
+
+@ -----------------------------------------
+Como medir sucesso (KPIs)
+
+% de false positives em fingerprinting
+
+Tempo médio para reconhecimento inicial por alvo
+
+Taxa de detecção de scanners (como o Umbra sinaliza seu próprio recon)
+
+Reprodutibilidade dos resultados
+
+------------------------------------------ @
+
+@ -----------------------------------------
+Falhas comuns — e como eliminá-las
+
+Fazer tudo em um arquivo monolítico → modularize.
+
+Sem limites de taxa → causa banimento do alvo e resultados ruins.
+
+Resultados não normalizados → dificulta scoring e comparação.
+
+Ignorar testes locais → cria bugs em produção; use containers e fixtures.
+
+Focar só em cobertura, ignorando qualidade → menos é mais: varredura inteligente > varredura massiva mal configurada.
+
+------------------------------------------ @ 
+
+@ -----------------------------------------
+Heurísticas práticas de fingerprinting
+
+Priorize: header server, TLS cert CN/SAN, response timing, HTTP error pages, default favicon hash.
+
+Combine sinais: 2+ sinais semelhantes = confiança alta.
+
+Exemplo de score simples (pseudo):
+
+banner match → +0.6
+
+TLS cert org mismatch → +0.4
+
+favicon hash match → +0.2
+
+se soma > 1.0 → serviço identificado com confiança alta
+
+------------------------------------------ @ 
+
+@ -----------------------------------------
+Integração com tua fórmula de ativação (-0.3 a 2)
+
+Mapeie métricas para escala:
+
+exposição de admin endpoint público → +0.8
+
+versão conhecida com CVE crítica → +1.2
+
+porta padrão aberta sem autenticação → +0.4
+
+muitos sinais fracos → somar gradualmente
+
+Normaliza: score = clamp(-0.3, 2, base_score)
+------------------------------------------ @
+
+@ -----------------------------------------
+Checklist mínimo antes de rodar no alvo real
+
+ Autorização documentada?
+
+ Janelas de teste definidas?
+
+ Backups & rollback se necessário?
+
+ Limites de taxa e proxy configurados?
+
+ Logs ativos e armazenamento seguro?
+
+ Ambiente de testes com dados sensíveis isolados?
+
+ ------------------------------------------ @

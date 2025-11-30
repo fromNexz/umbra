@@ -1,0 +1,23 @@
+┌─────────────────────────────────────────────────────────┐
+│                    UMBRA CORE                           │
+│  (Camada de Proteção - analisa e pontua tráfego)        │
+│                                                         │
+│  • Recebe dados dos scanners                            │
+│  • Aplica scoring (-0.3 a 2.0)                          │
+│  • Decide: bloquear, permitir, alertar                  │
+│  • Analisa padrões de ataque                            │
+│  • Gerencia regras de firewall/WAF                      │
+└─────────────────────────────────────────────────────────┘
+                          ↑
+                          │ (recebe JSON)
+                          │
+┌─────────────────────────────────────────────────────────┐
+│                    UMBRA SCANNERS                       │
+│  (Ferramentas de teste - geram tráfego suspeito)        │
+│                                                         │
+│  • passive_osint.py → coleta info pública               │
+│  • active_scan.py → port scan, banner grab              │
+│  • http_enum.py → brute force de diretórios             │
+│                                                         │
+│  Objetivo: TESTAR se o Umbra Core detecta ataques       │
+└─────────────────────────────────────────────────────────┘

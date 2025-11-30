@@ -1,0 +1,36 @@
+# Core
+python-dotenv==1.0.0
+pydantic==2.5.0
+
+# Async & HTTP
+aiohttp==3.9.1
+asyncio==3.4.3
+httpx==0.25.2
+
+# Network & DNS
+dnspython==2.4.2
+python-whois==0.8.0
+aiodns==3.1.1
+
+# Database
+aiosqlite==0.19.0
+
+# Logging & Observability
+structlog==23.2.0
+colorama==0.4.6
+
+# Security & Validation
+validators==0.22.0
+ipaddress  # (built-in no Python 3.10+)
+
+# Utils
+python-dateutil==2.8.2
+pytz==2023.3
+
+# CLI 
+click==8.1.7
+rich==13.7.0  # Para output bonito no terminal
+
+# Testing 
+pytest==7.4.3
+pytest-asyncio==0.21.1

@@ -1,0 +1,24 @@
+Metadata-Version: 2.4
+Name: umbra-scanners
+Version: 0.1.0
+Summary: Ferramentas de reconhecimento e enumeração para testar o Umbra Core
+Home-page: https://github.com/seu-usuario/umbra-scanners
+Author: Seu Nome
+Author-email: seu@email.com
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Security
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-python
+Dynamic: summary

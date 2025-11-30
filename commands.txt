@@ -1,0 +1,369 @@
+================================================================================
+                        UMBRA SCANNERS - GUIA DE COMANDOS
+================================================================================
+
+SINTAXE GERAL:
+    python -m cli [OPÇÕES_GLOBAIS] COMANDO [OPÇÕES_DO_COMANDO] ALVO
+
+
+================================================================================
+                            OPÇÕES GLOBAIS
+================================================================================
+
+--help, -h              Mostra ajuda geral ou de um comando específico
+--version               Mostra a versão do Umbra
+--verbose, -v           Ativa modo verbose (mostra logs DEBUG)
+--quiet, -q             Modo silencioso (mostra apenas erros)
+
+EXEMPLOS:
+    python -m cli --help
+    python -m cli recon --help
+    python -m cli --version
+    python -m cli -v scan localhost --fast
+
+
+================================================================================
+                        COMANDO: RECON (Reconhecimento Passivo)
+================================================================================
+
+DESCRIÇÃO:
+    Realiza OSINT (Open Source Intelligence) passivo de um alvo.
+    Coleta informações públicas sem tocar diretamente no alvo.
+
+SINTAXE:
+    python -m cli recon ALVO [OPÇÕES]
+
+ALVO:
+    • Domínio: example.com, google.com
+    • IP: 8.8.8.8, 192.168.1.1
+    • localhost
+
+OPÇÕES:
+    --output, -o FILE       Salva resultado em arquivo JSON
+    --no-subdomains         Desabilita busca de subdomínios (mais rápido)
+    --no-asn                Desabilita lookup de ASN/Geolocalização
+    --timeout N             Timeout em segundos (padrão: 10)
+    --format FORMATO        Formato de saída: json, table, both (padrão: table)
+
+O QUE COLETA:
+    ✓ Whois (registrar, data de criação, name servers)
+    ✓ DNS Records (A, AAAA, MX, NS, TXT, CNAME)
+    ✓ Reverse DNS (hostname do IP)
+    ✓ Subdomínios (via Certificate Transparency Logs)
+    ✓ ASN e Geolocalização (organização, país, cidade)
+
+EXEMPLOS:
+
+    # Recon básico de um domínio
+    python -m cli recon google.com
+
+    # Recon de um IP público
+    python -m cli recon 8.8.8.8
+
+    # Recon sem busca de subdomínios (mais rápido)
+    python -m cli recon example.com --no-subdomains
+
+    # Salvar resultado em JSON
+    python -m cli recon github.com -o resultado.json
+
+    # Ver resultado apenas em JSON (sem tabela)
+    python -m cli recon example.com --format json
+
+    # Recon com timeout customizado
+    python -m cli recon slow-site.com --timeout 20
+
+    # Modo verbose (ver todos os logs)
+    python -m cli -v recon example.com
+
+    # Recon de localhost
+    python -m cli recon localhost
+
+
+================================================================================
+                        COMANDO: SCAN (Port Scanning)
+================================================================================
+
+DESCRIÇÃO:
+    Realiza scan de portas TCP em um alvo.
+    Identifica portas abertas, serviços e captura banners.
+
+SINTAXE:
+    python -m cli scan ALVO [OPÇÕES]
+
+ALVO:
+    • IP: 192.168.1.1, 127.0.0.1
+    • Domínio: example.com
+    • localhost
+
+OPÇÕES:
+    --ports, -p PORTAS      Portas ou range (ex: 80,443 ou 1-1000)
+    --timeout, -t N         Timeout por porta em segundos (padrão: 3)
+    --fast                  Scan rápido (apenas top 100 portas)
+    --no-banner             Não captura banners (mais rápido)
+    --max-concurrent N      Máximo de scans simultâneos (padrão: 100)
+    --output, -o FILE       Salva resultado em arquivo JSON
+    --format FORMATO        Formato de saída: json, table, both (padrão: table)
+
+O QUE FAZ:
+    ✓ TCP Connect Scan (tenta conectar em cada porta)
+    ✓ Banner Grabbing (captura banner do serviço)
+    ✓ Service Fingerprinting (identifica o serviço)
+    ✓ Score de risco (calcula risco de cada porta aberta)
+
+EXEMPLOS:
+
+    # Scan rápido no localhost (top 100 portas)
+    python -m cli scan localhost --fast
+
+    # Scan em portas específicas
+    python -m cli scan 192.168.1.1 --ports 80,443,22,8080
+
+    # Scan em um range de portas
+    python -m cli scan 127.0.0.1 --ports 1-1000
+
+    # Scan completo (top 1000 portas)
+    python -m cli scan 192.168.1.1
+
+    # Scan sem captura de banner (mais rápido)
+    python -m cli scan localhost --fast --no-banner
+
+    # Scan com timeout curto (mais rápido, menos preciso)
+    python -m cli scan 10.0.0.1 --ports 1-100 --timeout 1
+
+    # Scan com mais concorrência (mais rápido)
+    python -m cli scan 192.168.1.1 --fast --max-concurrent 200
+
+    # Salvar resultado em JSON
+    python -m cli scan localhost --ports 8080,3306 -o scan_resultado.json
+
+    # Ver resultado em JSON
+    python -m cli scan localhost --fast --format json
+
+    # Modo verbose (ver logs detalhados)
+    python -m cli -v scan localhost --ports 8080
+
+
+================================================================================
+                    COMANDO: ENUM (HTTP Enumeration) [EM BREVE]
+================================================================================
+
+DESCRIÇÃO:
+    Realiza enumeração HTTP (diretórios, arquivos).
+    [NOTA: Este módulo ainda não está implementado]
+
+SINTAXE:
+    python -m cli enum URL [OPÇÕES]
+
+URL:
+    • http://localhost:8080
+    • https://example.com
+
+OPÇÕES:
+    --wordlist, -w FILE     Wordlist para brute force
+    --threads N             Número de threads (padrão: 10)
+    --output, -o FILE       Salva resultado em arquivo JSON
+
+EXEMPLOS:
+
+    # Enumeração básica
+    python -m cli enum http://localhost:8080
+
+    # Com wordlist customizada
+    python -m cli enum http://site.com --wordlist common.txt
+
+
+================================================================================
+                            CENÁRIOS DE USO
+================================================================================
+
+CENÁRIO 1: RECONHECIMENTO INICIAL DE UM ALVO
+    # Passo 1: Recon passivo
+    python -m cli recon example.com -o recon.json
+
+    # Passo 2: Port scan nos IPs encontrados
+    python -m cli scan 93.184.216.34 --fast -o scan.json
+
+
+CENÁRIO 2: TESTE LOCAL (DESENVOLVIMENTO)
+    # Terminal 1: Sobe servidor de teste
+    python test_server.py
+
+    # Terminal 2: Escaneia portas abertas
+    python -m cli scan localhost --ports 8080,3306,2222,6379
+
+
+CENÁRIO 3: AUDITORIA DE SEGURANÇA
+    # Passo 1: Recon completo
+    python -m cli recon empresa.com -o recon_empresa.json
+
+    # Passo 2: Scan detalhado
+    python -m cli scan 192.168.1.0 --ports 1-65535 -o scan_completo.json
+
+
+CENÁRIO 4: SCAN RÁPIDO DE MÚLTIPLOS ALVOS
+    # Cria script bash/batch para múltiplos alvos
+    for ip in 192.168.1.{1..254}; do
+        python -m cli scan $ip --fast -o "scan_$ip.json"
+    done
+
+
+================================================================================
+                        INTERPRETANDO RESULTADOS
+================================================================================
+
+SCORE (PONTUAÇÃO DE RISCO):
+    -0.3 a 0.3  → Risco Baixo (normal)
+    0.3 a 1.0   → Risco Médio (atenção)
+    1.0 a 2.0   → Risco Alto (crítico)
+
+ESTADOS DE PORTA:
+    open        → Porta aberta (serviço respondendo)
+    closed      → Porta fechada (conexão recusada)
+    filtered    → Porta filtrada (firewall/timeout)
+
+BANNERS:
+    Informações que o serviço envia ao conectar.
+    Exemplo: "SSH-2.0-OpenSSH_8.2p1"
+    Útil para: fingerprinting, detecção de versões vulneráveis
+
+
+================================================================================
+                            FORMATO DE SAÍDA JSON
+================================================================================
+
+Todos os comandos retornam JSON padronizado:
+
+{
+  "target": "example.com",
+  "type": "recon/passive" ou "recon/active_scan",
+  "timestamp": "2025-11-29T23:45:00Z",
+  "trace_id": "550e8400-e29b-41d4-a716-446655440000",
+  "results": [
+    {
+      "port": 80,
+      "service": "http",
+      "banner": "nginx/1.18.0",
+      "score": 0.5
+    }
+  ],
+  "score_total": 0.75,
+  "meta": {
+    "scan_time_s": 3.2,
+    "tool_version": "umbra-recon-0.1.0",
+    "ports_scanned": 100,
+    "ports_open": 3
+  }
+}
+
+
+================================================================================
+                            DICAS E BOAS PRÁTICAS
+================================================================================
+
+1. SEMPRE use --fast primeiro para scan inicial rápido
+2. Use --no-banner se só quer saber quais portas estão abertas
+3. Aumente --timeout em redes lentas ou alvos distantes
+4. Reduza --max-concurrent se estiver causando problemas de rede
+5. SEMPRE salve resultados com -o para análise posterior
+6. Use -v (verbose) para debugging
+7. Respeite rate limits e termos de serviço
+8. NUNCA escaneie alvos sem autorização explícita
+
+
+================================================================================
+                        TROUBLESHOOTING (PROBLEMAS COMUNS)
+================================================================================
+
+PROBLEMA: "Invalid target"
+SOLUÇÃO: Verifique se o alvo é um IP, domínio ou localhost válido.
+         URLs completas (http://...) não funcionam com 'recon' ou 'scan'.
+
+PROBLEMA: "Nenhuma porta aberta encontrada"
+SOLUÇÃO: Verifique se há serviços rodando no alvo.
+         Use test_server.py para testes locais.
+
+PROBLEMA: Scan muito lento
+SOLUÇÃO: Use --fast, aumente --max-concurrent, reduza --timeout.
+
+PROBLEMA: "Connection refused" em todas as portas
+SOLUÇÃO: Firewall pode estar bloqueando. Teste com localhost primeiro.
+
+PROBLEMA: Comando 'umbra' não reconhecido
+SOLUÇÃO: Use 'python -m cli' em vez de 'umbra'.
+         Ou instale globalmente com: pip install -e .
+
+
+================================================================================
+                            ESTRUTURA DE ARQUIVOS
+================================================================================
+
+umbra_scanners/
+├── cli.py                  # Entry point principal
+├── commands/               # Comandos CLI
+│   ├── recon.py           # Comando 'recon'
+│   ├── scan.py            # Comando 'scan'
+│   └── enum.py            # Comando 'enum'
+├── core/                   # Funções core
+│   ├── utils.py           # Utilitários gerais
+│   └── logger.py          # Sistema de logs
+├── recon/                  # Módulos de reconhecimento
+│   ├── passive_osint.py   # OSINT passivo
+│   └── active_scan.py     # Port scanning
+├── test_server.py          # Servidor de teste
+└── requirements.txt        # Dependências
+
+
+================================================================================
+                            EXEMPLOS PRÁTICOS
+================================================================================
+
+# 1. Reconhecimento completo do Google
+python -m cli recon google.com
+
+# 2. Scan rápido no seu PC
+python -m cli scan localhost --fast
+
+# 3. Scan em porta específica com servidor rodando
+python -m http.server 8080  # Terminal 1
+python -m cli scan localhost --ports 8080  # Terminal 2
+
+# 4. Recon + Scan de um alvo
+python -m cli recon example.com -o recon.json
+python -m cli scan example.com --fast -o scan.json
+
+# 5. Teste com múltiplos serviços
+python test_server.py  # Terminal 1
+python -m cli scan localhost --ports 2222,3306,6379,8080  # Terminal 2
+
+# 6. Scan verboso para debugging
+python -m cli -v scan localhost --ports 8080
+
+# 7. Salvar todos os resultados
+python -m cli recon google.com -o google_recon.json
+python -m cli scan 8.8.8.8 --fast -o google_scan.json
+
+
+================================================================================
+                            INFORMAÇÕES ADICIONAIS
+================================================================================
+
+VERSÃO: 0.1.0
+DESENVOLVIDO PARA: Testar detecção de ataques no Umbra Core
+LINGUAGEM: Python 3.10+
+LICENÇA: MIT
+
+AVISOS LEGAIS:
+⚠️  Use apenas em sistemas que você tem autorização explícita para testar.
+⚠️  Respeite rate limits e termos de serviço de APIs públicas.
+⚠️  Configure timeouts apropriados para evitar sobrecarga.
+⚠️  NUNCA use contra sistemas de terceiros sem permissão por escrito.
+
+SUPORTE:
+• Documentação: README.md
+• Testes: python -m pytest (quando implementado)
+• Logs: São salvos automaticamente com trace_id para correlação
+
+
+================================================================================
+                                FIM DO GUIA
+================================================================================

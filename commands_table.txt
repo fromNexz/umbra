@@ -1,0 +1,122 @@
+================================================================================
+                    UMBRA SCANNERS - REFERÊNCIA RÁPIDA
+================================================================================
+
+COMANDOS PRINCIPAIS:
+┌─────────────────────────────────────────────────────────────────────────┐
+│ COMANDO │ DESCRIÇÃO                        │ EXEMPLO                    │
+├─────────┼──────────────────────────────────┼────────────────────────────┤
+│ recon   │ Reconhecimento passivo (OSINT)   │ recon google.com           │
+│ scan    │ Port scanning TCP                │ scan localhost --fast      │
+│ enum    │ HTTP enumeration (em breve)      │ enum http://localhost:8080 │
+└─────────┴──────────────────────────────────┴────────────────────────────┘
+
+OPÇÕES GLOBAIS:
+┌──────────────────────────────────────────────────────────────────────────┐
+│ OPÇÃO        │ DESCRIÇÃO                                                 │
+├──────────────┼───────────────────────────────────────────────────────────┤
+│ -h, --help   │ Mostra ajuda                                              │
+│ -v, --verbose│ Modo verbose (logs DEBUG)                                 │
+│ -q, --quiet  │ Modo silencioso (apenas erros)                            │
+│ --version    │ Mostra versão                                             │
+└──────────────┴───────────────────────────────────────────────────────────┘
+
+COMANDO RECON:
+┌──────────────────────────────────────────────────────────────────────────┐
+│ OPÇÃO            │ DESCRIÇÃO                                             │
+├──────────────────┼───────────────────────────────────────────────────────┤
+│ -o, --output     │ Salva em JSON                                         │
+│ --no-subdomains  │ Não busca subdomínios (mais rápido)                   │
+│ --no-asn         │ Não busca ASN/geolocalização                          │
+│ --timeout N      │ Timeout em segundos (padrão: 10)                      │
+│ --format json    │ Output em JSON puro                                   │
+└──────────────────┴───────────────────────────────────────────────────────┘
+
+EXEMPLOS:
+    python -m cli recon google.com
+    python -m cli recon 8.8.8.8 --no-subdomains
+    python -m cli recon example.com -o resultado.json
+
+COMANDO SCAN:
+┌──────────────────────────────────────────────────────────────────────────┐
+│ OPÇÃO              │ DESCRIÇÃO                                           │
+├────────────────────┼─────────────────────────────────────────────────────┤
+│ -p, --ports PORTAS │ Portas (ex: 80,443 ou 1-1000)                       │
+│ -t, --timeout N    │ Timeout por porta (padrão: 3s)                      │
+│ --fast             │ Scan rápido (top 100 portas)                        │
+│ --no-banner        │ Não captura banners                                 │
+│ --max-concurrent N │ Scans simultâneos (padrão: 100)                     │
+│ -o, --output       │ Salva em JSON                                       │
+│ --format json      │ Output em JSON puro                                 │
+└────────────────────┴─────────────────────────────────────────────────────┘
+
+EXEMPLOS:
+    python -m cli scan localhost --fast
+    python -m cli scan 192.168.1.1 --ports 80,443,22
+    python -m cli scan 127.0.0.1 --ports 1-1000
+    python -m cli scan localhost --ports 8080 -o resultado.json
+
+ALVOS VÁLIDOS:
+┌──────────────────────────────────────────────────────────────────────────┐
+│ TIPO     │ EXEMPLO            │ COMANDO RECON │ COMANDO SCAN │
+├──────────┼────────────────────┼───────────────┼──────────────┤
+│ IP       │ 192.168.1.1        │ ✓             │ ✓            │
+│ Domínio  │ example.com        │ ✓             │ ✓            │
+│ Localhost│ localhost          │ ✓             │ ✓            │
+│ IP Local │ 127.0.0.1          │ ✓             │ ✓            │
+│ URL      │ http://site.com    │ ✗             │ ✗            │
+└──────────┴────────────────────┴───────────────┴──────────────┘
+
+TESTE LOCAL (COM SERVIDOR):
+    # Terminal 1: Sobe servidor
+    python -m http.server 8080
+
+    # Terminal 2: Escaneia
+    python -m cli scan localhost --ports 8080
+
+    # Ou use o servidor de teste completo:
+    python test_server.py  # Terminal 1
+    python -m cli scan localhost --ports 2222,3306,8080  # Terminal 2
+
+SCORES (RISCO):
+┌──────────────────────────────────────────────────────────────────────────┐
+│ RANGE      │ RISCO     │ AÇÃO RECOMENDADA                                │
+├────────────┼───────────┼─────────────────────────────────────────────────┤
+│ -0.3 a 0.3 │ Baixo     │ Normal, sem ação necessária                     │
+│ 0.3 a 1.0  │ Médio     │ Revisar configurações                           │
+│ 1.0 a 2.0  │ Alto      │ Ação imediata necessária                        │
+└────────────┴───────────┴─────────────────────────────────────────────────┘
+
+ESTADOS DE PORTA:
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ESTADO   │ SIGNIFICADO                                                   │
+├──────────┼───────────────────────────────────────────────────────────────┤
+│ open     │ Porta aberta (serviço respondendo)                           │
+│ closed   │ Porta fechada (conexão recusada)                             │
+│ filtered │ Porta filtrada (firewall/timeout)                            │
+└──────────┴───────────────────────────────────────────────────────────────┘
+
+TROUBLESHOOTING RÁPIDO:
+┌──────────────────────────────────────────────────────────────────────────┐
+│ PROBLEMA                  │ SOLUÇÃO                                      │
+├───────────────────────────┼──────────────────────────────────────────────┤
+│ Invalid target            │ Use IP, domínio ou localhost (sem http://)   │
+│ Nenhuma porta aberta      │ Inicie um serviço (python -m http.server)    │
+│ Scan muito lento          │ Use --fast ou reduza --timeout               │
+│ 'umbra' não reconhecido   │ Use 'python -m cli' ao invés                 │
+└───────────────────────────┴──────────────────────────────────────────────┘
+
+FLUXO DE TRABALHO RECOMENDADO:
+    1. python -m cli recon example.com -o recon.json
+    2. python -m cli scan example.com --fast -o scan.json
+    3. Analise os JSONs gerados
+    4. Scan detalhado nas portas abertas encontradas
+
+DICAS:
+    ✓ Use --fast primeiro para scan inicial
+    ✓ Sempre salve com -o para análise posterior
+    ✓ Use -v para debugging
+    ✓ Teste localmente antes de alvos externos
+    ✓ NUNCA escaneie sem autorização
+
+================================================================================
