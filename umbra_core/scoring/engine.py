@@ -11,6 +11,11 @@ import time
 from typing import Dict, List, Tuple
 from dataclasses import dataclass, field
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+      from umbra_core.scoring.weights import WeightConfig
+      from umbra_core.scoring.factors import ScoringFactors
 
 @dataclass
 class ScoringResult:
