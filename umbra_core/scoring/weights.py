@@ -15,6 +15,8 @@ Recomendação: Faça ajustes incrementais de 0.1 e teste bastante.
 from typing import Dict, List
 from dataclasses import dataclass
 
+from typing import TYPE_CHECKING
+
 
 @dataclass
 class WeightConfig:
