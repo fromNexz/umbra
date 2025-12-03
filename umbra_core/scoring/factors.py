@@ -11,6 +11,11 @@ import re
 from typing import List, Dict, Set
 from dataclasses import dataclass
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+      from umbra_core.scoring.weights import WeightConfig
+
 
 @dataclass
 class FactorResult:
